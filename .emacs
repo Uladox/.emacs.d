@@ -24,6 +24,45 @@
 
 ;;{{{ Built-in emacs configurations
 
+;; (scroll-bar-mode -1)
+(set-language-environment "UTF-8")
+; Here I toggle copyright on top of file
+(add-hook 'c-mode-common-hook #'elide-head)
+(global-set-key (kbd "C-c r") 'elide-head)
+(global-set-key (kbd "C-c R") 
+		(lambda ()
+		  (interactive)
+		  (elide-head t)))
+
+;; (defun c-lineup-arglist-tabs-only (ignored)
+;;   "Line up argument lists by tabs, not spaces"
+;;   (let* ((anchor (c-langelem-pos c-syntactic-element))
+;;          (column (c-langelem-2nd-pos c-syntactic-element))
+;;          (offset (- (1+ column) anchor))
+;;          (steps (floor offset c-basic-offset)))
+;;     (* (max steps 1)
+;;        c-basic-offset)))
+
+
+;; (add-hook 'c-mode-common-hook
+;;           (lambda ()
+;;             ;; Add kernel style
+;;             (c-add-style
+;;              "linux-tabs-only"
+;;              '("linux" (c-offsets-alist
+;;                         (arglist-cont-nonempty
+;;                          c-lineup-gcc-asm-reg
+;;                          c-lineup-arglist-tabs-only))))))
+
+
+(add-hook 'c-mode-hook
+          (lambda ()
+            ;; Enable kernel mode for the appropriate files
+	    (setq indent-tabs-mode t)
+	    (setq show-trailing-whitespace t)
+	    (c-set-style "linux")))
+ 
+
 ; Show parens
 (setq show-paren-delay 0)
 (show-paren-mode 1)
@@ -41,11 +80,14 @@
 ; vi like % for paren matching
 (global-set-key (kbd "C-%") 'goto-match-paren)
 (defun goto-match-paren (arg)
-  "Go to the matching parenthesis if on parenthesis, otherwise insert %.
-vi style of % jumping to matching brace."
+  "Go to the matching parenthesis if on parenthesis,
+   otherwise insert %. vi style of % jumping to 
+   matching brace."
   (interactive "p")
-  (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
-        ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
+  (cond ((looking-at "\\s\(")
+	 (forward-list 1) (backward-char 1))
+        ((looking-at "\\s\)")
+	 (forward-char 1) (backward-list 1))
         (t (self-insert-command (or arg 1)))))
 
 (setq inhibit-splash-screen t)
@@ -83,13 +125,28 @@ vi style of % jumping to matching brace."
   (interactive)
   (when (active-minibuffer-window)
     (select-window (active-minibuffer-window))))
+
+(global-set-key (kbd "C-; r") 'sudo-edit)
+(require 'recentf)
+(recentf-mode 1)
+(defun sudo-edit ()
+  (interactive)
+  (if (string= (substring buffer-file-name 0 21)
+	       "/sudo:root@localhost:")
+      (message "You're already here!")
+    (find-file (concat "/sudo:root@localhost:"
+		       buffer-file-name))))
+
 ;;}}}
 
 ;;{{{ Setup package manager
+
 (require 'package)
-(add-to-list 
- 'package-archives 
- '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(setq package-archives 
+      '(("gnu" . "http://elpa.gnu.org/packages/")
+	("melpa" . "http://melpa.milkbox.net/packages/")
+	("marmalade" . "https://marmalade-repo.org/packages/")
+	("org" . "http://orgmode.org/elpa/")))
 (package-initialize)
 
 ; fetch packages available
@@ -105,20 +162,20 @@ vi style of % jumping to matching brace."
 	unicode-fonts
 	cider
 	markdown-mode
-	slime
 	paredit
 	rinari
 	scss-mode
 	web-mode
 	powerline
 	neotree
-	projectile
-	projectile-rails
 	hydra
 	multiple-cursors
-	workgroups2
+	perl6-mode
 	magit
-	geiser))
+	smex
+	ido-vertical-mode
+	ido-yes-or-no
+	evil-god-state))
 
 ; fetch the list of packages available 
 (unless package-archive-contents
@@ -128,6 +185,7 @@ vi style of % jumping to matching brace."
 (dolist (curr-package my-package-list)
   (unless (package-installed-p curr-package)
     (package-install curr-package)))
+
 ;;}}}
 
 ;;{{{ Use-package requirement
@@ -137,12 +195,16 @@ vi style of % jumping to matching brace."
 ;;{{{ Packages configuration
 
   ;;{{{ Folding
+
 (use-package folding
   :init
   (load "~/.emacs.d/folding.el" 'nomessage 'noerror)
   (folding-add-to-marks-list 'ruby-mode "#{{{" "#}}}" nil t)
+  (folding-add-to-marks-list 'c-mode "//{{{" "//}}}" nil t)
   (folding-mode-add-find-file-hook)
-  (add-hook 'emacs-lisp-mode-hook #'folding-mode))
+  (add-hook 'emacs-lisp-mode-hook #'folding-mode)
+  (add-hook 'c-mode-common-hook #'folding-mode))
+
   ;;}}}
 
   ;;{{{ Unicode font loading
@@ -161,6 +223,12 @@ vi style of % jumping to matching brace."
 	(append '(("\\.vala$" . vala-mode)) auto-mode-alist)))
   ;;}}}
 
+  ;;{{{ Perl6-mode
+(use-package perl6-mode
+  :ensure t
+  :defer t)
+  ;;}}}
+
   ;;{{{ Paredit
 (use-package paredit
  :init
@@ -172,7 +240,8 @@ vi style of % jumping to matching brace."
  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
- (add-hook 'racket-mode-hook           #'enable-paredit-mode))
+ (add-hook 'racket-mode-hook           #'enable-paredit-mode)
+ (global-set-key (kbd "C-; k") 'delete-backward-char))
   ;;}}}
 
   ;;{{{ Hydra-splitter (hydra-mode)
@@ -238,11 +307,78 @@ vi style of % jumping to matching brace."
   (global-set-key (kbd "C-x aa") 'mc/mark-all-like-this))
   ;;}}}
 
+  ;;{{{ Evil mode
+(use-package evil-mode
+  :init
+  (evil-mode)
+  (setq evil-insert-state-cursor   '((bar . 10) "green"))
+  (setq evil-normal-state-cursor   '((bar . 7) "yellow"))
+  (setq evil-visual-state-cursor   '((bar . 7) "magenta"))
+  (setq evil-motion-state-cursor   '((bar . 7) "dark red"))
+  (setq evil-replace-state-cursor  '((bar . 7) "deep sky blue"))
+  (setq evil-operator-state-cursor '((bar . 7) "peru"))
+
+  (setcdr evil-insert-state-map nil)
+  (define-key evil-insert-state-map [escape] 'evil-normal-state)
+  (evil-define-key 'normal global-map  [space] 'mc/edit-lines)
+  ;; (define-key evil-insert-state-map (kbd "jk") 'evil-normal-state)
+  ;; (define-key evil-insert-state-map (kbd "jj") 'insert-jay)  
+  ;; (defun insert-jay ()
+  ;;   (interactive)
+  ;;   (insert "j"))
+  )
+  ;; (define-key help-mode-map (kbd "i") 'evil-emacs-state)
+  ;; (define-key grep-mode-map (kbd "i") 'evil-emacs-state)
+  
+  ;;}}}
+
+  ;;{{{ Evil God State
+(use-package evil-god-state
+  :init
+  (evil-define-key 'normal global-map "," 'evil-execute-in-god-state)
+  (add-hook 'evil-god-state-entry-hook (lambda () (diminish 'god-local-mode)))
+  (add-hook 'evil-god-state-exit-hook (lambda () (diminish-undo 'god-local-mode)))
+  (evil-define-key 'god global-map [escape] 'evil-god-state-bail))
+  ;;}}}
+
+  ;;{{{ Ido
+(use-package ido
+  :init
+  (ido-mode t))
+  ;;}}}
+
+  ;;{{{ Ido vetical mode
+(use-package ido-vertical-mode
+  :config
+  (setq ido-use-faces t)
+  (set-face-attribute 'ido-vertical-first-match-face nil
+		      :background nil
+		      :foreground "orange")
+  (set-face-attribute 'ido-vertical-only-match-face nil
+		      :background nil
+		      :foreground nil)
+  (set-face-attribute 'ido-vertical-match-face nil
+		      :foreground nil)
+  (ido-vertical-mode 1)
+  (setq ido-vertical-define-keys 'C-n-and-C-p-only))
+  ;;}}}
+
+  ;;{{{ Ido yes or no
+(use-package ido-yes-or-no
+  :init
+  (ido-yes-or-no-mode))
+  ;;}}}
+
   ;;{{{ Slime
+
 (use-package slime
   :init
+  (load (expand-file-name
+	 "~/quicklisp/slime-helper.el"))
   (setq inferior-lisp-program "/usr/bin/sbcl")
-  (slime-setup '(slime-repl)))
+  (require 'slime-autoloads)
+  (slime-setup '(slime-fancy)))
+
   ;;}}}
 
   ;;{{{ Markdown mode (requires pandoc, not an emacs package)
@@ -258,40 +394,22 @@ vi style of % jumping to matching brace."
 	 ("\\.md\\'" . markdown-mode))
   :config
   (custom-set-variables
-   '(markdown-command "/usr/bin/pandoc")))
+   '(markdown-command "pandoc")))
   ;;}}}
 
-  ;;{{{ God mode
-(use-package god-mode
-  :bind
-  ("C-<return>" . god-mode-all)
-  ("C-x C-1" . delete-other-windows)
-  ("C-x C-2" . split-window-below)
-  ("C-x C-3" . split-window-right)
-  ("C-x C-0" . delete-window)
-  ("C-x C-j" . other-windbow))
+  ;;{{{ Smex
+(use-package smex
+  :init
+  (smex-initialize)
+  (global-set-key (kbd "M-x") 'smex))
   ;;}}}
 
   ;;{{{ Neotree
+
 (use-package neotree
   :bind
   ("<f2>" . neotree-toggle))
 
-; C mode hooks
-; Here I toggle copyright on top of file
-(add-hook 'c-mode-common-hook #'elide-head)
-(global-set-key (kbd "C-c r") 'elide-head)
-(global-set-key (kbd "C-c R") 
-		(lambda ()
-		  (interactive)
-		  (elide-head t)))
-  ;;}}}
-
-  ;;{{{ Projectile
-(use-package projectile
-  :init
-  (projectile-global-mode)
-  (add-hook 'projectile-mode-hook 'projectile-rails-on))
   ;;}}}
 
   ;;{{{ Web developement
@@ -331,6 +449,7 @@ vi style of % jumping to matching brace."
     ;;}}}
 
     ;;{{{ Scss mode for rails
+
 (use-package scss-mode
   :config
   (setq exec-path (cons (expand-file-name "~/.rvm/gems/ruby-2.1.5/bin/sass") exec-path))
@@ -338,9 +457,11 @@ vi style of % jumping to matching brace."
   (add-hook 'css-mode-hook
 	    (lambda ()
 	      (setq css-indent-offset 2))))
+
     ;;}}}
 
     ;;{{{ Web-mode
+
 (defun cwebber-web-mode-customizations ()
   "Hooks for Web mode."
   (setq web-mode-markup-indent-offset 2)
@@ -357,6 +478,7 @@ vi style of % jumping to matching brace."
   (("\\.erb\\'" . web-mode))
   :init
   (add-hook 'web-mode-hook 'cwebber-web-mode-customizations))
+
     ;;}}}
 
  ;;}}}
@@ -445,11 +567,11 @@ vi style of % jumping to matching brace."
   ;;}}}
 
   ;;{{{ Workgroups
-(use-package workgroups2
-  :init
-  (setq wg-prefix-key (kbd "C-c z"))
-  (setq wg-session-file "~/.emacs.d/.emacs_workgroups")
-  (workgroups-mode 1))
+;; (use-package workgroups2
+;;   :init
+;;   (setq wg-prefix-key (kbd "C-c z"))
+;;   (setq wg-session-file "~/.emacs.d/.emacs_workgroups")
+;;   (workgroups-mode 1))
   ;;}}}
 
 ;;}}}
