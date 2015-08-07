@@ -1,4 +1,4 @@
-; my favorite folding mode for emacs
+;; my favorite folding mode for emacs
 ;; Use `C-c @ C-s' to show entry
 ;;{{{ Instructions For Folding
 ;; C-c @ C-x hide entry
@@ -26,7 +26,7 @@
 
 ;; (scroll-bar-mode -1)
 (set-language-environment "UTF-8")
-; Here I toggle copyright on top of file
+;; Here I toggle copyright on top of file
 (add-hook 'c-mode-common-hook #'elide-head)
 (global-set-key (kbd "C-c r") 'elide-head)
 (global-set-key (kbd "C-c R") 
@@ -63,21 +63,21 @@
 	    (c-set-style "linux")))
  
 
-; Show parens
+;; Show parens
 (setq show-paren-delay 0)
 (show-paren-mode 1)
 
-; Org mode
+;; Org mode
 (setq org-log-done t)
 
-; for easier auto complete
+;; for easier auto complete
 (global-set-key
  (kbd "C-; C-;") 
  (lambda ()
    (interactive)
    (dabbrev-expand nil)))
 
-; vi like % for paren matching
+;; vi like % for paren matching
 (global-set-key (kbd "C-%") 'goto-match-paren)
 (defun goto-match-paren (arg)
   "Go to the matching parenthesis if on parenthesis,
@@ -149,39 +149,41 @@
 	("org" . "http://orgmode.org/elpa/")))
 (package-initialize)
 
-; fetch packages available
+;; fetch packages available
 (unless package-archive-contents
   (package-refresh-contents))
 
-; list of my packages
+;; list of my packages
 (setq my-package-list 
       '(use-package
-	god-mode
-	racket-mode
-	vala-mode
-	unicode-fonts
-	cider
-	markdown-mode
-	paredit
-	rinari
-	scss-mode
-	web-mode
-	powerline
-	neotree
-	hydra
-	multiple-cursors
-	perl6-mode
-	magit
-	smex
-	ido-vertical-mode
-	ido-yes-or-no
-	evil-god-state))
+	 folding
+	 god-mode
+	 racket-mode
+	 vala-mode
+	 unicode-fonts
+	 cider
+	 markdown-mode
+	 paredit
+	 rinari
+	 scss-mode
+	 web-mode
+	 multi-web-mode
+	 powerline
+	 neotree
+	 hydra
+	 multiple-cursors
+	 perl6-mode
+	 magit
+	 smex
+	 ido-vertical-mode
+	 ido-yes-or-no
+	 evil-god-state))
 
-; fetch the list of packages available 
+;; fetch the list of packages available 
 (unless package-archive-contents
   (package-refresh-contents))
 
-; install the missing packages
+;; install the missing packages
 (dolist (curr-package my-package-list)
   (unless (package-installed-p curr-package)
     (package-install curr-package)))
@@ -197,8 +199,9 @@
   ;;{{{ Folding
 
 (use-package folding
-  :init
-  (load "~/.emacs.d/folding.el" 'nomessage 'noerror)
+  :config
+  ;; (autoload 'folding-mode          "folding" "Folding mode" t)
+  ;; (load "~/.emacs.d/folding.el" 'nomessage 'noerror)
   (folding-add-to-marks-list 'ruby-mode "#{{{" "#}}}" nil t)
   (folding-add-to-marks-list 'c-mode "//{{{" "//}}}" nil t)
   (folding-mode-add-find-file-hook)
@@ -230,6 +233,7 @@
   ;;}}}
 
   ;;{{{ Paredit
+
 (use-package paredit
  :init
  (autoload 'enable-paredit-mode "paredit" 
@@ -242,9 +246,11 @@
  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
  (add-hook 'racket-mode-hook           #'enable-paredit-mode)
  (global-set-key (kbd "C-; k") 'delete-backward-char))
+
   ;;}}}
 
   ;;{{{ Hydra-splitter (hydra-mode)
+
 (require 'hydra-examples)
 (defhydra hydra-splitter (global-map "C-x aq")
   "splitter"
@@ -296,6 +302,7 @@
    ("t" toggle-truncate-lines "truncate" :color blue)
    ("w" whitespace-mode "whitespace" :color blue)
    ("q" nil "cancel")))
+
   ;;}}}
 
   ;;{{{ Multiple-cursors
@@ -320,7 +327,9 @@
 
   (setcdr evil-insert-state-map nil)
   (define-key evil-insert-state-map [escape] 'evil-normal-state)
-  (evil-define-key 'normal global-map  [space] 'mc/edit-lines)
+  (setq evil-default-state 'insert)
+  ;; (evil-define-key 'normal global-map  [space] 'mc/edit-lines)
+  ;; (setq evil-default-state 'evil-emacs-state)
   ;; (define-key evil-insert-state-map (kbd "jk") 'evil-normal-state)
   ;; (define-key evil-insert-state-map (kbd "jj") 'insert-jay)  
   ;; (defun insert-jay ()
@@ -415,8 +424,8 @@
   ;;{{{ Web developement
 
     ;;{{{ Rinari for rails
-; For some useful rails erb that rinari does not have,
-; yes I even checked the source files
+;; For some useful rails erb that rinari does not have,
+;; yes I even checked the source files
 (defun rinari-erb-eval ()
   (interactive)
   (insert "<%  %>")
@@ -451,8 +460,8 @@
     ;;{{{ Scss mode for rails
 
 (use-package scss-mode
-  :config
-  (setq exec-path (cons (expand-file-name "~/.rvm/gems/ruby-2.1.5/bin/sass") exec-path))
+  ;; :config
+  ;; (setq exec-path (cons (expand-file-name "~/.rvm/gems/ruby-2.1.5/bin/sass") exec-path))
   :init
   (add-hook 'css-mode-hook
 	    (lambda ()
@@ -478,6 +487,19 @@
   (("\\.erb\\'" . web-mode))
   :init
   (add-hook 'web-mode-hook 'cwebber-web-mode-customizations))
+
+    ;;}}}
+
+    ;;{{{ Multi-Web-Mode
+
+(require 'multi-web-mode)
+(setq mweb-default-major-mode 'html-mode)
+(setq mweb-tags 
+  '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
+    (js-mode  "<script[^>]*>" "</script>")
+    (css-mode "<style[^>]*>" "</style>")))
+(setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
+(multi-web-global-mode 1)
 
     ;;}}}
 
