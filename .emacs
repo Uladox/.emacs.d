@@ -137,6 +137,8 @@
     (find-file (concat "/sudo:root@localhost:"
 		       buffer-file-name))))
 
+(setq asm-comment-char ?#)
+
 ;;}}}
 
 ;;{{{ Setup package manager
@@ -172,12 +174,15 @@
 	 neotree
 	 hydra
 	 multiple-cursors
+	 haml-mode
 	 perl6-mode
 	 magit
 	 smex
 	 ido-vertical-mode
 	 ido-yes-or-no
-	 evil-god-state))
+	 haskell-mode
+	 evil-god-state
+	 lua-mode))
 
 ;; fetch the list of packages available 
 (unless package-archive-contents
@@ -226,13 +231,48 @@
 	(append '(("\\.vala$" . vala-mode)) auto-mode-alist)))
   ;;}}}
 
+  ;;{{{ Agda mode
+(load-file (let ((coding-system-for-read 'utf-8))
+                (shell-command-to-string "agda-mode locate")))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(markdown-command "pandoc"))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(agda2-highlight-datatype-face ((t (:foreground "dark olive green"))))
+ '(agda2-highlight-function-face ((t (:foreground "dark olive green"))))
+ '(agda2-highlight-postulate-face ((t (:foreground "dark olive green"))))
+ '(agda2-highlight-primitive-face ((t (:foreground "dark olive green"))))
+ '(agda2-highlight-primitive-type-face ((t (:foreground "dark olive green"))))
+ '(agda2-highlight-record-face ((t (:foreground "dark olive green")))))
+  ;;}}}
+
   ;;{{{ Perl6-mode
 (use-package perl6-mode
   :ensure t
   :defer t)
   ;;}}}
 
+  ;;{{{ Haskell-mode
+(use-package haskell-mode
+  :init
+  (add-hook 'haskell-mode-hook 'haskell-indentation-mode))
+  ;;}}}
+
   ;;{{{ Paredit
+
+(defun override-slime-repl-bindings-with-paredit ()
+  (define-key slime-repl-mode-map
+    (read-kbd-macro paredit-backward-delete-key) nil))
+
+(add-hook 'slime-repl-mode-hook
+	  'override-slime-repl-bindings-with-paredit)
 
 (use-package paredit
  :init
@@ -245,6 +285,7 @@
  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
  (add-hook 'racket-mode-hook           #'enable-paredit-mode)
+ (add-hook 'slime-repl-mode-hook      #'enable-paredit-mode)
  (global-set-key (kbd "C-; k") 'delete-backward-char))
 
   ;;}}}
@@ -503,6 +544,9 @@
 
     ;;}}}
 
+    ;;{{{ Haml-mode
+(use-package haml-mode)
+    ;;}}}
  ;;}}}
 
   ;;{{{ Guitar.el
@@ -597,3 +641,5 @@
   ;;}}}
 
 ;;}}}
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
