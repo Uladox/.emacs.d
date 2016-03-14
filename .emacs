@@ -34,27 +34,6 @@
 		  (interactive)
 		  (elide-head t)))
 
-;; (defun c-lineup-arglist-tabs-only (ignored)
-;;   "Line up argument lists by tabs, not spaces"
-;;   (let* ((anchor (c-langelem-pos c-syntactic-element))
-;;          (column (c-langelem-2nd-pos c-syntactic-element))
-;;          (offset (- (1+ column) anchor))
-;;          (steps (floor offset c-basic-offset)))
-;;     (* (max steps 1)
-;;        c-basic-offset)))
-
-
-;; (add-hook 'c-mode-common-hook
-;;           (lambda ()
-;;             ;; Add kernel style
-;;             (c-add-style
-;;              "linux-tabs-only"
-;;              '("linux" (c-offsets-alist
-;;                         (arglist-cont-nonempty
-;;                          c-lineup-gcc-asm-reg
-;;                          c-lineup-arglist-tabs-only))))))
-
-
 (add-hook 'c-mode-hook
           (lambda ()
             ;; Enable kernel mode for the appropriate files
@@ -131,11 +110,8 @@
 (recentf-mode 1)
 (defun sudo-edit ()
   (interactive)
-  (if (string= (substring buffer-file-name 0 21)
-	       "/sudo:root@localhost:")
-      (message "You're already here!")
-    (find-file (concat "/sudo:root@localhost:"
-		       buffer-file-name))))
+  (find-file (concat "/sudo:root@localhost:"
+		     buffer-file-name)))
 
 (setq asm-comment-char ?#)
 
@@ -159,10 +135,10 @@
 (setq my-package-list 
       '(use-package
 	 folding
-	 god-mode
 	 racket-mode
 	 vala-mode
-	 unicode-fonts
+	 company-emoji
+	 ;; unicode-fonts
 	 cider
 	 markdown-mode
 	 paredit
@@ -174,7 +150,6 @@
 	 neotree
 	 hydra
 	 multiple-cursors
-	 haml-mode
 	 perl6-mode
 	 magit
 	 smex
@@ -182,7 +157,9 @@
 	 ido-yes-or-no
 	 haskell-mode
 	 evil-god-state
-	 lua-mode))
+	 stumpwm-mode
+	 lua-mode
+	 org-journal))
 
 ;; fetch the list of packages available 
 (unless package-archive-contents
@@ -201,6 +178,25 @@
 
 ;;{{{ Packages configuration
 
+  ;;{{{ Auctex
+(load "auctex.el" nil t t)
+(load "preview-latex.el" nil t t)
+  ;;}}}
+
+  ;;{{{ Latex previewing
+;; http://bnbeckwith.com/blog/org-mode-tikz-previews-on-windows.html
+(eval-after-load "preview"
+  '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzpicture}" t))
+(setq org-latex-create-formula-image-program 'imagemagick)
+  ;;}}}
+
+  ;;{{{ Org
+(add-hook 'org-mode-hook
+  (lambda()
+    (flyspell-mode 1)
+    (auto-fill-mode)))
+  ;;}}}
+
   ;;{{{ Folding
 
 (use-package folding
@@ -216,11 +212,29 @@
   ;;}}}
 
   ;;{{{ Unicode font loading
-(global-set-key (kbd "C-; C-u") 
-		(lambda ()
-		  (interactive)
-		  (require 'unicode-fonts)
-		  (unicode-fonts-setup)))
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
+;; (global-set-key (kbd "C-; C-u") 
+;; 		(lambda ()
+;; 		  (interactive)
+;; 		  (require 'unicode-fonts)
+;; 		  (unicode-fonts-setup)))
+(defun --set-emoji-font (frame)
+  "Adjust the font settings of FRAME so Emacs can display emoji properly."
+  (if (eq system-type 'darwin)
+      ;; For NS/Cocoa
+      (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend)
+    ;; For Linux
+    (set-fontset-font t 'symbol (font-spec :family "Symbola") frame 'prepend)))
+
+;; For when Emacs is started in GUI mode:
+(--set-emoji-font nil)
+;; Hook for when a frame is created with emacsclient
+;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
+(add-hook 'after-make-frame-functions '--set-emoji-font)
+(require 'company-emoji)
+(add-to-list 'company-backends 'company-emoji)
+
   ;;}}}
 
   ;;{{{ Vala-mode
@@ -549,11 +563,6 @@
     ;;}}}
  ;;}}}
 
-  ;;{{{ Guitar.el
-;; (add-to-list 'load-path "~/stuff/guitar.el")
-;; (load "guitar.el")
-;; (require 'guitar-mode)
-;;}}}
 
   ;;{{{ Powerline, eye candy, mostly to impress non emacs users
 (use-package powerline
@@ -627,19 +636,14 @@
   (my-powerline-default-theme))
   ;;}}}
 
-  ;;{{{ Zone
-;; (require 'zone)
-;; (put 'erase-buffer 'disabled nil)
-  ;;}}}
-
-  ;;{{{ Workgroups
-;; (use-package workgroups2
-;;   :init
-;;   (setq wg-prefix-key (kbd "C-c z"))
-;;   (setq wg-session-file "~/.emacs.d/.emacs_workgroups")
-;;   (workgroups-mode 1))
-  ;;}}}
-
 ;;}}}
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
+(fset 'respace-text
+      (lambda (&optional arg)
+	"Keyboard macro."
+	(interactive "p")
+	(kmacro-exec-ring-item
+	 (quote
+	  ([14 1 tab 67108896 1 backspace backspace 5 32 24 40] 0 "%d"))
+	 arg)))
