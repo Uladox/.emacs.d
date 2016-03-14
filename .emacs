@@ -138,6 +138,7 @@
 	 racket-mode
 	 vala-mode
 	 company-emoji
+	 emojify
 	 ;; unicode-fonts
 	 cider
 	 markdown-mode
@@ -224,7 +225,7 @@
   (if (eq system-type 'darwin)
       ;; For NS/Cocoa
       (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend)
-    ;; For Linux
+    ;; For Linux (Symbola or Emoji One Color)
     (set-fontset-font t 'symbol (font-spec :family "Symbola") frame 'prepend)))
 
 ;; For when Emacs is started in GUI mode:
@@ -234,6 +235,7 @@
 (add-hook 'after-make-frame-functions '--set-emoji-font)
 (require 'company-emoji)
 (add-to-list 'company-backends 'company-emoji)
+(add-hook 'after-init-hook #'global-emojify-mode)
 
   ;;}}}
 
