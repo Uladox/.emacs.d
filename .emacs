@@ -1,5 +1,6 @@
 ;; my favorite folding mode for emacs
 ;; Use `C-c @ C-s' to show entry
+;; 
 ;;{{{ Instructions For Folding
 ;; C-c @ C-x hide entry
 ;; C-c @ C-u Get out/in of folding
@@ -8,6 +9,7 @@
 ;;}}}
 
 ;;{{{ License (GPL3)
+
  ;;    This program is free software: you can redistribute it and/or modify
  ;;    it under the terms of the GNU General Public License as published by
  ;;    the Free Software Foundation, either version 3 of the License, or
@@ -20,6 +22,7 @@
 
  ;;    You should have received a copy of the GNU General Public License
  ;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 ;;}}}
 
 ;;{{{ Built-in emacs configurations
@@ -136,7 +139,6 @@
       '(use-package
 	 folding
 	 racket-mode
-	 vala-mode
 	 company-emoji
 	 emojify
 	 ;; unicode-fonts
@@ -160,6 +162,7 @@
 	 evil-god-state
 	 stumpwm-mode
 	 lua-mode
+	 evil
 	 org-journal))
 
 ;; fetch the list of packages available 
@@ -179,16 +182,13 @@
 
 ;;{{{ Packages configuration
 
-  ;;{{{ Auctex
-(load "auctex.el" nil t t)
-(load "preview-latex.el" nil t t)
-  ;;}}}
-
   ;;{{{ Latex previewing
+
 ;; http://bnbeckwith.com/blog/org-mode-tikz-previews-on-windows.html
 (eval-after-load "preview"
   '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzpicture}" t))
 (setq org-latex-create-formula-image-program 'imagemagick)
+
   ;;}}}
 
   ;;{{{ Org
@@ -213,6 +213,7 @@
   ;;}}}
 
   ;;{{{ Unicode font loading
+
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
 ;; (global-set-key (kbd "C-; C-u") 
@@ -237,36 +238,6 @@
 (add-to-list 'company-backends 'company-emoji)
 (add-hook 'after-init-hook #'global-emojify-mode)
 
-  ;;}}}
-
-  ;;{{{ Vala-mode
-(use-package vala-mode
-  :init
-  (autoload 'vala-mode "vala-mode" "Major mode for editing Vala code." t)
-  (setq auto-mode-alist
-	(append '(("\\.vala$" . vala-mode)) auto-mode-alist)))
-  ;;}}}
-
-  ;;{{{ Agda mode
-(load-file (let ((coding-system-for-read 'utf-8))
-                (shell-command-to-string "agda-mode locate")))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(markdown-command "pandoc"))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(agda2-highlight-datatype-face ((t (:foreground "dark olive green"))))
- '(agda2-highlight-function-face ((t (:foreground "dark olive green"))))
- '(agda2-highlight-postulate-face ((t (:foreground "dark olive green"))))
- '(agda2-highlight-primitive-face ((t (:foreground "dark olive green"))))
- '(agda2-highlight-primitive-type-face ((t (:foreground "dark olive green"))))
- '(agda2-highlight-record-face ((t (:foreground "dark olive green")))))
   ;;}}}
 
   ;;{{{ Perl6-mode
@@ -372,39 +343,43 @@
   ;;}}}
 
   ;;{{{ Evil mode
-(use-package evil-mode
-  :init
-  (evil-mode)
-  (setq evil-insert-state-cursor   '((bar . 10) "green"))
-  (setq evil-normal-state-cursor   '((bar . 7) "yellow"))
-  (setq evil-visual-state-cursor   '((bar . 7) "magenta"))
-  (setq evil-motion-state-cursor   '((bar . 7) "dark red"))
-  (setq evil-replace-state-cursor  '((bar . 7) "deep sky blue"))
-  (setq evil-operator-state-cursor '((bar . 7) "peru"))
 
-  (setcdr evil-insert-state-map nil)
-  (define-key evil-insert-state-map [escape] 'evil-normal-state)
-  (setq evil-default-state 'insert)
-  ;; (evil-define-key 'normal global-map  [space] 'mc/edit-lines)
-  ;; (setq evil-default-state 'evil-emacs-state)
-  ;; (define-key evil-insert-state-map (kbd "jk") 'evil-normal-state)
-  ;; (define-key evil-insert-state-map (kbd "jj") 'insert-jay)  
-  ;; (defun insert-jay ()
-  ;;   (interactive)
-  ;;   (insert "j"))
-  )
+;; (use-package evil-mode
+;;   :init
+;;   (evil-mode)
+;;   (setq evil-insert-state-cursor   '((bar . 10) "green"))
+;;   (setq evil-normal-state-cursor   '((bar . 7) "yellow"))
+;;   (setq evil-visual-state-cursor   '((bar . 7) "magenta"))
+;;   (setq evil-motion-state-cursor   '((bar . 7) "dark red"))
+;;   (setq evil-replace-state-cursor  '((bar . 7) "deep sky blue"))
+;;   (setq evil-operator-state-cursor '((bar . 7) "peru"))
+;;   ;; (evil-define-key 'normal global-map  [space] 'mc/edit-lines)
+;;   ;; (setq evil-default-state 'evil-emacs-state)
+;;   ;; (define-key evil-insert-state-map (kbd "jk") 'evil-normal-state)
+;;   ;; (define-key evil-insert-state-map (kbd "jj") 'insert-jay)  
+;;   ;; (defun insert-jay ()
+;;   ;;   (interactive)
+;;   ;;   (insert "j"))
+;;   )
+;;   (setq evil-insert-state-map (make-sparse-keymap))
+;;   (define-key evil-insert-state-map [escape] 'evil-normal-state)
+;; (setq evil-default-state 'insert)
+;;  (setq evil-insert-state-map (make-sparse-keymap))
+;;   (define-key evil-insert-state-map [escape] 'evil-normal-state)
+;;   (setq evil-default-state 'insert)
+ 
   ;; (define-key help-mode-map (kbd "i") 'evil-emacs-state)
   ;; (define-key grep-mode-map (kbd "i") 'evil-emacs-state)
-  
+
   ;;}}}
 
   ;;{{{ Evil God State
-(use-package evil-god-state
-  :init
-  (evil-define-key 'normal global-map "," 'evil-execute-in-god-state)
-  (add-hook 'evil-god-state-entry-hook (lambda () (diminish 'god-local-mode)))
-  (add-hook 'evil-god-state-exit-hook (lambda () (diminish-undo 'god-local-mode)))
-  (evil-define-key 'god global-map [escape] 'evil-god-state-bail))
+;; (use-package evil-god-state
+;;   :init
+;;   (evil-define-key 'normal global-map "," 'evil-execute-in-god-state)
+;;   (add-hook 'evil-god-state-entry-hook (lambda () (diminish 'god-local-mode)))
+;;   (add-hook 'evil-god-state-exit-hook (lambda () (diminish-undo 'god-local-mode)))
+;;   (evil-define-key 'god global-map [escape] 'evil-god-state-bail))
   ;;}}}
 
   ;;{{{ Ido
@@ -439,11 +414,7 @@
 
 (use-package slime
   :init
-  (load (expand-file-name
-	 "~/quicklisp/slime-helper.el"))
-  (setq inferior-lisp-program "/usr/bin/sbcl")
-  (require 'slime-autoloads)
-  (slime-setup '(slime-fancy)))
+  (setq inferior-lisp-program "/usr/bin/sbcl"))
 
   ;;}}}
 
@@ -560,10 +531,15 @@
 
     ;;}}}
 
-    ;;{{{ Haml-mode
-(use-package haml-mode)
-    ;;}}}
  ;;}}}
+
+  ;;{{{ Vala-mode
+(use-package vala-mode
+  :init
+  (autoload 'vala-mode "vala-mode" "Major mode for editing Vala code." t)
+  (setq auto-mode-alist
+	(append '(("\\.vala$" . vala-mode)) auto-mode-alist)))
+  ;;}}}
 
 
   ;;{{{ Powerline, eye candy, mostly to impress non emacs users
