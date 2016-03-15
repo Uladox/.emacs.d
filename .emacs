@@ -27,6 +27,12 @@
 
 ;;{{{ Built-in emacs configurations
 
+(global-set-key (kbd "C-; c")
+		(lambda ()
+		  (interactive)
+		  (byte-recompile-directory
+		   (file-name-directory (buffer-file-name)) 0 t)))
+
 ;; (scroll-bar-mode -1)
 (set-language-environment "UTF-8")
 ;; Here I toggle copyright on top of file
