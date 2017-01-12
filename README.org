@@ -1,5 +1,0 @@
-* My emacs
-  This contains my .emacs file along with all the
-  resources required to use it that are not on MELPA
-* Why is this README a .org file
-  This is emacs

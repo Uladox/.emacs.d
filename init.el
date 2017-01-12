@@ -42,26 +42,28 @@
 
 ;; list of my packages
 (setq my-package-list 
-      '( use-package
-	 indent-guide
-	 folding
-	 aggressive-indent
-	 ace-window
-	 racket-mode
-	 company-emoji
-	 emojify
-	 slime
-	 markdown-mode
-	 paredit
-	 powerline
-	 perl6-mode
-	 magit
-	 smex
-	 ido-vertical-mode
-	 ido-yes-or-no
-	 haskell-mode
-	 lua-mode
-	 org-journal))
+      '(indent-guide
+	use-package 
+	folding
+	aggressive-indent
+	ace-window
+	racket-mode
+	company-emoji
+	emojify
+	slime
+	markdown-mode
+	paredit
+	powerline
+	perl6-mode
+	magit
+	smex
+	ido-vertical-mode
+	ido-yes-or-no
+	haskell-mode
+	lua-mode
+	org-journal
+	ac-c-headers
+	smartparens))
 
 ;; fetch the list of packages available 
 (unless package-archive-contents
@@ -92,6 +94,8 @@
 (global-prettify-symbols-mode 1)
 (require 'indent-guide)
 (indent-guide-global-mode)
+(setq display-time-day-and-date t)
+(display-time-mode 1)
 ;;}}}
 
 ;;{{{ Basic key-bindings
@@ -207,7 +211,6 @@ the sort order."
 ;;{{{ Specific config
 
 ;;{{{ C
-
 (add-hook 'c-mode-hook
           (lambda ()
 	    (setq indent-tabs-mode t)
@@ -217,24 +220,31 @@ the sort order."
 (add-hook 'c-mode-hook #'aggressive-indent-mode)
 
 (add-hook 'c-mode-hook
-	  (lambda ()
-	    (interactive)
+	  (lambda ()	    
 	    (setq prettify-symbols-alist
 		  '(("->" . ?→)
 		    ("!=" . ?≠)
 		    ("<=" . ?≤)
 		    (">=" . ?≥)))))
 
-  ;;}}}
+(add-hook 'c-mode-hook
+	  (lambda ()
+	    (add-to-list 'ac-sources 'ac-source-c-headers)
+	    (add-to-list 'ac-sources 'ac-source-c-header-symbols t)))
+
+(require 'smartparens-config)
+(add-hook 'c-mode-hook #'smartparens-mode)
+;;}}}
 
 ;;{{{ elisp
 (add-hook 'emacs-lisp-mode-hook
 	  (lambda ()
-	    (setq prettify-symbols-alist '(("lambda" . ?λ)
-			       ("->" . ?→)
-			       ("!=" . ?≠)
-			       ("<=" . ?≤)
-			       (">=" . ?≥)))))
+	    (setq prettify-symbols-alist
+		  '(("lambda" . ?λ)
+		    ("->" . ?→)
+		    ("!=" . ?≠)
+		    ("<=" . ?≤)
+		    (">=" . ?≥)))))
 
 (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
 
@@ -243,7 +253,7 @@ the sort order."
 		  (interactive)
 		  (byte-recompile-directory
 		   (file-name-directory (buffer-file-name)) 0 t)))
-  ;;}}}
+;;}}}
 
 ;;{{{ Latex previewing
 ;; http://bnbeckwith.com/blog/org-mode-tikz-previews-on-windows.html
@@ -479,7 +489,7 @@ the sort order."
  '(markdown-command "pandoc")
  '(package-selected-packages
    (quote
-    (indent-guide darkroom aggressive-indent ace-window org-journal lua-mode haskell-mode ido-yes-or-no ido-vertical-mode smex magit perl6-mode powerline paredit markdown-mode slime emojify company-emoji racket-mode folding use-package))))
+    (smartparens ac-c-headers indent-guide darkroom aggressive-indent ace-window org-journal lua-mode haskell-mode ido-yes-or-no ido-vertical-mode smex magit perl6-mode powerline paredit markdown-mode slime emojify company-emoji racket-mode folding use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
