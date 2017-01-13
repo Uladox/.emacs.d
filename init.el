@@ -106,6 +106,8 @@
    (interactive)
    (dabbrev-expand nil)))
 
+(global-set-key (kbd "C-.") #'goto-line)
+
 (require 'recentf)
 (recentf-mode 1)
 
@@ -211,12 +213,6 @@ the sort order."
 ;;{{{ Specific config
 
 ;;{{{ C
-(add-hook 'c-mode-hook
-          (lambda ()
-	    (setq indent-tabs-mode t)
-	    (setq show-trailing-whitespace t)
-	    (c-set-style "linux")))
-
 (add-hook 'c-mode-hook #'aggressive-indent-mode)
 
 (add-hook 'c-mode-hook
@@ -234,6 +230,12 @@ the sort order."
 
 (require 'smartparens-config)
 (add-hook 'c-mode-hook #'smartparens-mode)
+
+(add-hook 'c-mode-hook
+          (lambda ()
+	    (setq indent-tabs-mode t)
+	    (setq show-trailing-whitespace t)
+	    (c-set-style "linux")))
 ;;}}}
 
 ;;{{{ elisp
