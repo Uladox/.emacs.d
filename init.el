@@ -3,10 +3,12 @@
 ;;
 
 ;;{{{ Instructions For Folding
+
 ;; C-c @ C-x hide entry
 ;; C-c @ C-u Get out/in of folding
 ;; C-c @ C-w Fold whole buffer
 ;; C-c @ C-o Unfold whole buffer 
+
 ;;}}}
 
 ;;{{{ License (GPL3)
@@ -77,6 +79,7 @@
 ;;}}}
 
 ;;{{{ Basic setting
+(server-start)
 (setq inhibit-splash-screen t)
 (load-theme 'deeper-blue t)
 (set-language-environment "UTF-8")
@@ -121,9 +124,9 @@
 ;; Here I toggle copyright on top of file
 (add-hook 'c-mode-common-hook #'elide-head)
 
-(global-set-key (kbd "C-c r") 'elide-head)
+(global-set-key (kbd "C-; l") 'elide-head)
 
-(global-set-key (kbd "C-c R") 
+(global-set-key (kbd "C-; L") 
 		(lambda ()
 		  (interactive)
 		  (elide-head t)))
@@ -157,7 +160,7 @@ the sort order."
       (let ((inhibit-field-text-motion t))
         (sort-subr reverse 'forward-line 'end-of-line)))))
 
-(global-set-key (kbd "C-c a") 'sort-lines)
+(global-set-key (kbd "C-; a") 'sort-lines)
 
 ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
 (defun rename-file-and-buffer (new-name)
@@ -175,7 +178,7 @@ the sort order."
           (set-visited-file-name new-name)
           (set-buffer-modified-p nil))))))
 
-(global-set-key (kbd "C-x tt") 'rename-file-and-buffer)
+(global-set-key (kbd "C-; n") 'rename-file-and-buffer)
 
 (global-set-key (kbd "M-p") 'ace-window)
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
@@ -211,6 +214,75 @@ the sort order."
 ;;}}}
 
 ;;{{{ Specific config
+
+;;{{{ exwm
+(require 'exwm)
+(require 'exwm-config)
+
+(exwm-config-ido)
+
+(setq exwm-workspace-number 4)
+
+(add-hook 'exwm-update-class-hook
+          (lambda ()
+            (unless (or (string-prefix-p "sun-awt-X11-" exwm-instance-name)
+                        (string= "gimp" exwm-instance-name))
+              (exwm-workspace-rename-buffer exwm-class-name))))
+
+(add-hook 'exwm-update-title-hook
+          (lambda ()
+            (when (or (not exwm-instance-name)
+                      (string-prefix-p "sun-awt-X11-" exwm-instance-name)
+                      (string= "gimp" exwm-instance-name))
+              (exwm-workspace-rename-buffer exwm-title))))
+
+(exwm-input-set-key (kbd "s-r") #'exwm-reset)
+(exwm-input-set-key (kbd "s-w") #'exwm-workspace-switch)
+
+(dotimes (i 10)
+  (exwm-input-set-key (kbd (format "s-%d" i))
+                      `(lambda ()
+                         (interactive)
+                         (exwm-workspace-switch-create ,i))))
+
+(exwm-input-set-key (kbd "s-&")
+                    (lambda (command)
+                      (interactive (list (read-shell-command "$ ")))
+                      (start-process-shell-command command nil command)))
+
+(push ?\C-q exwm-input-prefix-keys)
+(define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
+
+(setq default-simulation-keys
+      '(([?\C-b] . left)
+	([?\C-f] . right)
+	([?\C-p] . up)
+	([?\C-n] . down)
+	([?\C-a] . home)
+	([?\C-e] . end)
+	([?\M-v] . prior)
+	([?\C-v] . next)
+	([?\C-d] . delete)
+	([?\C-k] . (S-end delete))))
+
+(exwm-input-set-simulation-keys default-simulation-keys)
+
+(add-hook 'exwm-manage-finish-hook
+          (lambda ()
+            (when (and exwm-class-name
+                       (string= exwm-class-name "Firefox"))
+              (exwm-input-set-local-simulation-keys
+	       (append default-simulation-keys
+		       '(([?\C-s] . ?\C-f)
+			 ([?\C-i] . ?\C-k)))))))
+
+(exwm-input-set-key (kbd "s-f")
+		    (lambda ()
+		      (interactive)
+		      (start-process-shell-command "firefox" nil "firefox")))
+
+(exwm-enable)
+;;}}}
 
 ;;{{{ C
 (add-hook 'c-mode-hook #'aggressive-indent-mode)
@@ -254,7 +326,13 @@ the sort order."
 		(lambda ()
 		  (interactive)
 		  (byte-recompile-directory
-		   (file-name-directory (buffer-file-name)) 0 t)))
+		   (file-name-directory (buffer-file-name)))))
+
+(global-set-key (kbd "C-; C")
+		(lambda ()
+		  (interactive)
+		  (byte-recompile-file
+		   (buffer-file-name))))
 ;;}}}
 
 ;;{{{ Latex previewing
@@ -491,7 +569,7 @@ the sort order."
  '(markdown-command "pandoc")
  '(package-selected-packages
    (quote
-    (smartparens ac-c-headers indent-guide darkroom aggressive-indent ace-window org-journal lua-mode haskell-mode ido-yes-or-no ido-vertical-mode smex magit perl6-mode powerline paredit markdown-mode slime emojify company-emoji racket-mode folding use-package))))
+    (exwm smartparens ac-c-headers darkroom aggressive-indent ace-window org-journal lua-mode haskell-mode ido-yes-or-no ido-vertical-mode smex magit perl6-mode powerline paredit markdown-mode slime emojify company-emoji racket-mode folding use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
