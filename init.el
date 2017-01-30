@@ -7,7 +7,7 @@
 ;; C-c @ C-x hide entry
 ;; C-c @ C-u Get out/in of folding
 ;; C-c @ C-w Fold whole buffer
-;; C-c @ C-o Unfold whole buffer 
+;; C-c @ C-o Unfold whole buffer
 
 ;;}}}
 
@@ -31,7 +31,7 @@
 ;;{{{ Package manager
 
 (require 'package)
-(setq package-archives 
+(setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
 	("melpa" . "http://melpa.milkbox.net/packages/")
 	("marmalade" . "https://marmalade-repo.org/packages/")
@@ -43,9 +43,9 @@
   (package-refresh-contents))
 
 ;; list of my packages
-(setq my-package-list 
+(setq my-package-list
       '(indent-guide
-	use-package 
+	use-package
 	folding
 	aggressive-indent
 	ace-window
@@ -66,7 +66,7 @@
 	org-journal
 	ac-c-headers))
 
-;; fetch the list of packages available 
+;; fetch the list of packages available
 (unless package-archive-contents
   (package-refresh-contents))
 
@@ -103,7 +103,7 @@
 ;;{{{ Basic key-bindings
 ;; for easier auto complete
 (global-set-key
- (kbd "C-; C-;") 
+ (kbd "C-; C-;")
  (lambda ()
    (interactive)
    (dabbrev-expand nil)))
@@ -125,7 +125,7 @@
 
 (global-set-key (kbd "C-; l") 'elide-head)
 
-(global-set-key (kbd "C-; L") 
+(global-set-key (kbd "C-; L")
 		(lambda ()
 		  (interactive)
 		  (elide-head t)))
@@ -133,14 +133,14 @@
 ;; vi like % for paren matching
 (defun goto-match-paren (arg)
   "Go to the matching parenthesis if on parenthesis,
-   otherwise insert %. vi style of % jumping to 
+   otherwise insert %. vi style of % jumping to
    matching brace."
   (interactive "p")
   (cond ((looking-at "\\s\(")
 	 (forward-list 1) (backward-char 1))
-        ((looking-at "\\s\)")
+	((looking-at "\\s\)")
 	 (forward-char 1) (backward-list 1))
-        (t (self-insert-command (or arg 1)))))
+	(t (self-insert-command (or arg 1)))))
 
 (global-set-key (kbd "C-%") 'goto-match-paren)
 
@@ -157,7 +157,7 @@ the sort order."
       (narrow-to-region beg end)
       (goto-char (point-min))
       (let ((inhibit-field-text-motion t))
-        (sort-subr reverse 'forward-line 'end-of-line)))))
+	(sort-subr reverse 'forward-line 'end-of-line)))))
 
 (global-set-key (kbd "C-; a") 'sort-lines)
 
@@ -166,16 +166,16 @@ the sort order."
   "Renames both current buffer and file it's visiting to NEW-NAME."
   (interactive "sNew name: ")
   (let ((name (buffer-name))
-        (filename (buffer-file-name)))
+	(filename (buffer-file-name)))
     (if (not filename)
-        (message "Buffer '%s' is not visiting a file!" name)
+	(message "Buffer '%s' is not visiting a file!" name)
       (if (get-buffer new-name)
-          (message "A buffer named '%s' already exists!" new-name)
-        (progn
-          (rename-file name new-name 1)
-          (rename-buffer new-name)
-          (set-visited-file-name new-name)
-          (set-buffer-modified-p nil))))))
+	  (message "A buffer named '%s' already exists!" new-name)
+	(progn
+	  (rename-file name new-name 1)
+	  (rename-buffer new-name)
+	  (set-visited-file-name new-name)
+	  (set-buffer-modified-p nil))))))
 
 (global-set-key (kbd "C-; n") 'rename-file-and-buffer)
 
@@ -196,7 +196,7 @@ the sort order."
 (setq org-log-done t)
 
 (defun add-to-end (list element)
-  (append (list) 
+  (append (list)
 	  (list element)))
 
 (defun switch-to-minibuffer-window ()
@@ -223,17 +223,17 @@ the sort order."
 (setq exwm-workspace-number 4)
 
 (add-hook 'exwm-update-class-hook
-          (lambda ()
-            (unless (or (string-prefix-p "sun-awt-X11-" exwm-instance-name)
-                        (string= "gimp" exwm-instance-name))
-              (exwm-workspace-rename-buffer exwm-class-name))))
+	  (lambda ()
+	    (unless (or (string-prefix-p "sun-awt-X11-" exwm-instance-name)
+			(string= "gimp" exwm-instance-name))
+	      (exwm-workspace-rename-buffer exwm-class-name))))
 
 (add-hook 'exwm-update-title-hook
-          (lambda ()
-            (when (or (not exwm-instance-name)
-                      (string-prefix-p "sun-awt-X11-" exwm-instance-name)
-                      (string= "gimp" exwm-instance-name))
-              (exwm-workspace-rename-buffer exwm-title))))
+	  (lambda ()
+	    (when (or (not exwm-instance-name)
+		      (string-prefix-p "sun-awt-X11-" exwm-instance-name)
+		      (string= "gimp" exwm-instance-name))
+	      (exwm-workspace-rename-buffer exwm-title))))
 
 (exwm-input-set-key (kbd "s-r") #'exwm-reset)
 (exwm-input-set-key (kbd "s-w") #'exwm-workspace-switch)
@@ -241,14 +241,14 @@ the sort order."
 
 (dotimes (i 10)
   (exwm-input-set-key (kbd (format "s-%d" i))
-                      `(lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create ,i))))
+		      `(lambda ()
+			 (interactive)
+			 (exwm-workspace-switch-create ,i))))
 
 (exwm-input-set-key (kbd "s-&")
-                    (lambda (command)
-                      (interactive (list (read-shell-command "$ ")))
-                      (start-process-shell-command command nil command)))
+		    (lambda (command)
+		      (interactive (list (read-shell-command "$ ")))
+		      (start-process-shell-command command nil command)))
 
 (push ?\C-q exwm-input-prefix-keys)
 (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
@@ -268,10 +268,10 @@ the sort order."
 (exwm-input-set-simulation-keys default-simulation-keys)
 
 (add-hook 'exwm-manage-finish-hook
-          (lambda ()
-            (when (and exwm-class-name
-                       (string= exwm-class-name "Firefox"))
-              (exwm-input-set-local-simulation-keys
+	  (lambda ()
+	    (when (and exwm-class-name
+		       (string= exwm-class-name "Firefox"))
+	      (exwm-input-set-local-simulation-keys
 	       (append default-simulation-keys
 		       '(([?\C-s] . ?\C-f)
 			 ([?\C-i] . ?\C-k)))))))
@@ -288,7 +288,7 @@ the sort order."
 (add-hook 'c-mode-hook #'aggressive-indent-mode)
 
 (add-hook 'c-mode-hook
-	  (lambda ()	    
+	  (lambda ()
 	    (setq prettify-symbols-alist
 		  '(("->" . ?→)
 		    ("!=" . ?≠)
@@ -301,7 +301,7 @@ the sort order."
 	    (add-to-list 'ac-sources 'ac-source-c-header-symbols t)))
 
 (add-hook 'c-mode-hook
-          (lambda ()
+	  (lambda ()
 	    (setq indent-tabs-mode t)
 	    (setq show-trailing-whitespace t)
 	    (c-set-style "linux")))
@@ -399,7 +399,7 @@ the sort order."
 
 (use-package paredit
   :init
-  (autoload 'enable-paredit-mode "paredit" 
+  (autoload 'enable-paredit-mode "paredit"
     "Turn on pseudo-structural editing of Lisp code." t)
   (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
