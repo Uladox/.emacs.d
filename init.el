@@ -44,7 +44,8 @@
 
 ;; list of my packages
 (setq my-package-list
-      '(indent-guide
+      '(exwm
+	indent-guide
 	use-package
 	folding
 	aggressive-indent
