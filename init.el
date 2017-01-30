@@ -13,18 +13,18 @@
 
 ;;{{{ License (GPL3)
 
- ;;    This program is free software: you can redistribute it and/or modify
- ;;    it under the terms of the GNU General Public License as published by
- ;;    the Free Software Foundation, either version 3 of the License, or
- ;;    (at your option) any later version.
+;;    This program is free software: you can redistribute it and/or modify
+;;    it under the terms of the GNU General Public License as published by
+;;    the Free Software Foundation, either version 3 of the License, or
+;;    (at your option) any later version.
 
- ;;    This program is distributed in the hope that it will be useful,
- ;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
- ;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- ;;    GNU General Public License for more details.
+;;    This program is distributed in the hope that it will be useful,
+;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;    GNU General Public License for more details.
 
- ;;    You should have received a copy of the GNU General Public License
- ;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;;    You should have received a copy of the GNU General Public License
+;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;}}}
 
@@ -64,8 +64,7 @@
 	haskell-mode
 	lua-mode
 	org-journal
-	ac-c-headers
-	smartparens))
+	ac-c-headers))
 
 ;; fetch the list of packages available 
 (unless package-archive-contents
@@ -238,6 +237,7 @@ the sort order."
 
 (exwm-input-set-key (kbd "s-r") #'exwm-reset)
 (exwm-input-set-key (kbd "s-w") #'exwm-workspace-switch)
+(exwm-input-set-key (kbd "s-f") #'exwm-layout-set-fullscreen)
 
 (dotimes (i 10)
   (exwm-input-set-key (kbd (format "s-%d" i))
@@ -276,7 +276,7 @@ the sort order."
 		       '(([?\C-s] . ?\C-f)
 			 ([?\C-i] . ?\C-k)))))))
 
-(exwm-input-set-key (kbd "s-f")
+(exwm-input-set-key (kbd "s-i")
 		    (lambda ()
 		      (interactive)
 		      (start-process-shell-command "firefox" nil "firefox")))
@@ -299,9 +299,6 @@ the sort order."
 	  (lambda ()
 	    (add-to-list 'ac-sources 'ac-source-c-headers)
 	    (add-to-list 'ac-sources 'ac-source-c-header-symbols t)))
-
-(require 'smartparens-config)
-(add-hook 'c-mode-hook #'smartparens-mode)
 
 (add-hook 'c-mode-hook
           (lambda ()
@@ -341,14 +338,14 @@ the sort order."
   '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzpicture}" t))
 (setq org-latex-create-formula-image-program 'imagemagick)
 
-  ;;}}}
+;;}}}
 
 ;;{{{ Org
 (add-hook 'org-mode-hook
-  (lambda()
-    (flyspell-mode 1)
-    (auto-fill-mode)))
-  ;;}}}
+	  (lambda()
+	    (flyspell-mode 1)
+	    (auto-fill-mode)))
+;;}}}
 
 ;;{{{ Folding
 (use-package folding
@@ -358,7 +355,7 @@ the sort order."
   (folding-mode-add-find-file-hook)
   (add-hook 'emacs-lisp-mode-hook #'folding-mode)
   (add-hook 'c-mode-common-hook #'folding-mode))
-  ;;}}}
+;;}}}
 
 ;;{{{ Unicode font loading
 
@@ -384,13 +381,13 @@ the sort order."
 ;;{{{ Perl6-mode
 (use-package perl6-mode
   :ensure t :defer t)
-  ;;}}}
+;;}}}
 
 ;;{{{ Haskell-mode
 (use-package haskell-mode
   :init
   (add-hook 'haskell-mode-hook 'haskell-indentation-mode))
-  ;;}}}
+;;}}}
 
 ;;{{{ Paredit
 (defun override-slime-repl-bindings-with-paredit ()
@@ -401,25 +398,25 @@ the sort order."
 	  'override-slime-repl-bindings-with-paredit)
 
 (use-package paredit
- :init
- (autoload 'enable-paredit-mode "paredit" 
-   "Turn on pseudo-structural editing of Lisp code." t)
- (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
- (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
- (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
- (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
- (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
- (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
- (add-hook 'racket-mode-hook           #'enable-paredit-mode)
- (add-hook 'slime-repl-mode-hook       #'enable-paredit-mode)
- (global-set-key (kbd "C-; k") 'delete-backward-char))
-  ;;}}}
+  :init
+  (autoload 'enable-paredit-mode "paredit" 
+    "Turn on pseudo-structural editing of Lisp code." t)
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+  (add-hook 'racket-mode-hook           #'enable-paredit-mode)
+  (add-hook 'slime-repl-mode-hook       #'enable-paredit-mode)
+  (global-set-key (kbd "C-; k") 'delete-backward-char))
+;;}}}
 
 ;;{{{ Ido
 (use-package ido
   :init
   (ido-mode t))
-  ;;}}}
+;;}}}
 
 ;;{{{ Ido vetical mode
 (use-package ido-vertical-mode
@@ -435,39 +432,39 @@ the sort order."
 		      :foreground nil)
   (ido-vertical-mode 1)
   (setq ido-vertical-define-keys 'C-n-and-C-p-only))
-  ;;}}}
+;;}}}
 
 ;;{{{ Ido yes or no
 (use-package ido-yes-or-no
   :init
   (ido-yes-or-no-mode))
-  ;;}}}
+;;}}}
 
 ;;{{{ Slime
 (use-package slime
   :init
   (setq inferior-lisp-program "/usr/bin/sbcl"))
-  ;;}}}
+;;}}}
 
 ;;{{{ Markdown mode (requires pandoc, not an emacs package)
 (use-package markdown-mode
   :init
   (autoload 'markdown-mode "markdown-mode"
     "Major mode for editing Markdown files" t)
-   :mode (("\\.text\\'" . markdown-mode)
+  :mode (("\\.text\\'" . markdown-mode)
 	 ("\\.markdown\\'" . markdown-mode)
 	 ("\\.md\\'" . markdown-mode))
   :config
   (custom-set-variables
    '(markdown-command "pandoc")))
-  ;;}}}
+;;}}}
 
 ;;{{{ Smex
 (use-package smex
   :init
   (smex-initialize)
   (global-set-key (kbd "M-x") 'smex))
-  ;;}}}
+;;}}}
 
 ;;{{{ Powerline
 (use-package powerline
@@ -476,7 +473,7 @@ the sort order."
   (require 'powerline-separators)
   (require 'cl-lib)
 
-    ;;{{{ Ugly code for custom theme
+  ;;{{{ Ugly code for custom theme
   (defface my-powerline-active1 '((t (:background "SkyBlue3" :inherit mode-line)))
     "My Powerline face 1."
     :group 'powerline)
@@ -496,66 +493,66 @@ the sort order."
     "Setup the default mode-line."
     (interactive)
     (setq-default mode-line-format
-	  '("%e"
-	    (:eval
-	     (let* ((active (powerline-selected-window-active))
-		    (mode-line
-		     (if active
-			 'mode-line
-		       'mode-line-inactive))
-		    (face1
-		     (if active
-			 'my-powerline-active1
-		       'my-powerline-inactive1))
-		    (face2
-		     (if active
-			 'my-powerline-active2
-		       'my-powerline-inactive2))
-		    (separator-left
-		     (intern
-		      (format "powerline-%s-%s"
-			      'butt 'left)))
-		    (separator-right
-		     (intern
-		      (format "powerline-%s-%s"
-			      'wave 'right)))
-		    (lhs
-		     (list
-		      (powerline-raw "%*" nil 'l)
-		      (powerline-buffer-size nil 'l)
-		      (powerline-raw mode-line-mule-info nil 'l)
-		      (powerline-buffer-id nil 'l)
-		      (when (and (boundp 'which-func-mode)
-				 which-func-mode)
-			(powerline-raw which-func-format nil 'l))
-		      (powerline-raw " ")
-		      (funcall separator-left mode-line face1)
-		      (when (boundp 'erc-modified-channels-object)
-			(powerline-raw erc-modified-channels-object
-				       face1 'l))
-		      (powerline-major-mode face1 'l)
-		      (powerline-process face1)
-		      (powerline-minor-modes face1 'l)
-		      (powerline-narrow face1 'l)
-		      (powerline-raw " " face1)
-		      (funcall separator-left face1 face2)
-		      (powerline-vc face2 'r)))
-		    (rhs (list
-			  (powerline-raw global-mode-string face2 'r)
-			  (funcall separator-right face2 face1)
-			  (powerline-raw "%4l" face1 'l)
-			  (powerline-raw ":" face1 'l)
-			  (powerline-raw "%3c" face1 'r)
-			  (funcall separator-right face1 mode-line)
-			  (powerline-raw " ")
-			  (powerline-raw "%6p" nil 'r)
-			  (powerline-hud face2 face1))))
-	       (concat (powerline-render lhs)
-		       (powerline-fill face2 (powerline-width rhs))
-		       (powerline-render rhs))))))))
-    ;;}}}
+		  '("%e"
+		    (:eval
+		     (let* ((active (powerline-selected-window-active))
+			    (mode-line
+			     (if active
+				 'mode-line
+			       'mode-line-inactive))
+			    (face1
+			     (if active
+				 'my-powerline-active1
+			       'my-powerline-inactive1))
+			    (face2
+			     (if active
+				 'my-powerline-active2
+			       'my-powerline-inactive2))
+			    (separator-left
+			     (intern
+			      (format "powerline-%s-%s"
+				      'butt 'left)))
+			    (separator-right
+			     (intern
+			      (format "powerline-%s-%s"
+				      'wave 'right)))
+			    (lhs
+			     (list
+			      (powerline-raw "%*" nil 'l)
+			      (powerline-buffer-size nil 'l)
+			      (powerline-raw mode-line-mule-info nil 'l)
+			      (powerline-buffer-id nil 'l)
+			      (when (and (boundp 'which-func-mode)
+					 which-func-mode)
+				(powerline-raw which-func-format nil 'l))
+			      (powerline-raw " ")
+			      (funcall separator-left mode-line face1)
+			      (when (boundp 'erc-modified-channels-object)
+				(powerline-raw erc-modified-channels-object
+					       face1 'l))
+			      (powerline-major-mode face1 'l)
+			      (powerline-process face1)
+			      (powerline-minor-modes face1 'l)
+			      (powerline-narrow face1 'l)
+			      (powerline-raw " " face1)
+			      (funcall separator-left face1 face2)
+			      (powerline-vc face2 'r)))
+			    (rhs (list
+				  (powerline-raw global-mode-string face2 'r)
+				  (funcall separator-right face2 face1)
+				  (powerline-raw "%4l" face1 'l)
+				  (powerline-raw ":" face1 'l)
+				  (powerline-raw "%3c" face1 'r)
+				  (funcall separator-right face1 mode-line)
+				  (powerline-raw " ")
+				  (powerline-raw "%6p" nil 'r)
+				  (powerline-hud face2 face1))))
+		       (concat (powerline-render lhs)
+			       (powerline-fill face2 (powerline-width rhs))
+			       (powerline-render rhs))))))))
+;;}}}
 (my-powerline-default-theme)
-  ;;}}}
+;;}}}
 
 ;;}}}
 
@@ -569,7 +566,7 @@ the sort order."
  '(markdown-command "pandoc")
  '(package-selected-packages
    (quote
-    (exwm smartparens ac-c-headers darkroom aggressive-indent ace-window org-journal lua-mode haskell-mode ido-yes-or-no ido-vertical-mode smex magit perl6-mode powerline paredit markdown-mode slime emojify company-emoji racket-mode folding use-package))))
+    (exwm ac-c-headers darkroom aggressive-indent ace-window org-journal lua-mode haskell-mode ido-yes-or-no ido-vertical-mode smex magit perl6-mode powerline paredit markdown-mode slime emojify company-emoji racket-mode folding use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
